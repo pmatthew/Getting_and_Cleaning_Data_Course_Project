@@ -16,7 +16,7 @@ features <- read.csv("./Getting_and_Cleaning_Data_Course_Project/UCI HAR Dataset
 act <- read.csv("./Getting_and_Cleaning_Data_Course_Project/UCI HAR Dataset/activity_labels.txt",sep = " ", fileEncoding = "us-ascii", header = FALSE, col.names = c("id", "activity"))
 
 # extract the indexes of those columns, which name contains either "mean()" or "std()"; parenthesis needs to be escaped with //
-c <- as.vector(rbind(grep("std\\(\\)", features[,2]), grep("mean\\(\\)", features[,2])))
+c <- c(grep("-std", features[,2]), grep("-mean", features[,2]))
 
 # name the columns by features
 colnames(X_train) <- features[,2]
@@ -47,11 +47,13 @@ names(binded) <- gsub("^t","time",names(binded))
 names(binded) <- gsub("mean","Mean",names(binded))
 names(binded) <- gsub("std","StandardDeviation",names(binded))
 
+# Convert identifiers to factor
+binded$SubjectId <- as.factor(binded$SubjectId)
+binded$ActivityDesc <- as.factor(binded$ActivityDesc)
+
 # aggregate
-agr <- aggregate(binded[,3:68], by = list(subject_id=binded$SubjectId, activity_name=binded$ActivityDesc), mean)
+agr <- aggregate(binded[,3:81], by = list(SubjectId=binded$SubjectId, ActivityDesc=binded$ActivityDesc), mean)
 
 # save aggregate to file
 write.table(agr, "tidy_average.txt", row.names = F, quote = F)
-
-
 
